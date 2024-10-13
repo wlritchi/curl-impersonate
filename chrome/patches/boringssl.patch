@@ -62,7 +62,7 @@ index b13400097..8b457b873 100644
    hs->extension_permutation = std::move(permutation);
    return true;
  }
-@@ -3337,6 +3343,50 @@ static const struct tls_extension *tls_extension_find(uint32_t *out_index,
+@@ -3337,6 +3343,53 @@ static const struct tls_extension *tls_extension_find(uint32_t *out_index,
    return NULL;
  }
  
@@ -91,8 +91,11 @@ index b13400097..8b457b873 100644
 +  char *ext = strtok(tmp, delimiter);
 +  size_t idx = 0;
 +  while (ext != nullptr) {
-+    unsigned ext_index;
-+    tls_extension_find(&ext_index, atoi(ext));
++    unsigned ext_index = 0;
++    if (tls_extension_find(&ext_index, atoi(ext)) == NULL) {
++      free(tmp);
++      return false;
++    }
 +    // fprintf(stderr, "found %d -> %d, ", atoi(ext), ext_index);
 +    order[idx] = ext_index;
 +    ext = strtok(NULL, delimiter);
