@@ -106,12 +106,12 @@ jobs:
       - name: Run configure script
         run: |
           mkdir ${{ runner.temp }}/install
-          ./configure --prefix=${{ runner.temp }}/install \
+          CFLAGS='-g -O0 -fsanitize=address -fno-omit-frame-pointer' ./configure --prefix=${{ runner.temp }}/install \
                       --host=${{ matrix.host }} \
                       --with-zlib=${{ runner.temp }}/zlib \
                       --with-zstd=${{ runner.temp }}/zstd \
                       --with-ca-path=/etc/ssl/certs \
-                      --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
+                      --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt || cat config.log
 
       # Cache the build of BoringSSL, which is the longest part of the build
       # We must cache the .zip as well, otherwise the Makefile will
@@ -141,7 +141,7 @@ jobs:
 
       - name: Build the Chrome version of curl-impersonate
         run: |
-          make chrome-build
+          CFLAGS='-g -O0 -fsanitize=address -fno-omit-frame-pointer' make chrome-build
           make chrome-checkbuild
           make chrome-install
 
@@ -370,7 +370,7 @@ jobs:
       - name: Reconfigure statically
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          ./configure LDFLAGS="-L$(brew --prefix zstd)/lib" CPPFLAGS="-I$(brew --prefix zstd)/include" --prefix=${{ runner.temp }}/install --enable-static
+          ./configure LDFLAGS="-L$(brew --prefix zstd)/lib" CPPFLAGS="-I$(brew --prefix zstd)/include -g -O0 -fsanitize=address -fno-omit-frame-pointer" --prefix=${{ runner.temp }}/install --enable-static
 
       - name: Rebuild statically
         if: startsWith(github.ref, 'refs/tags/')
